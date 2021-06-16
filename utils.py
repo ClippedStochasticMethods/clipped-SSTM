@@ -70,7 +70,7 @@ def group_uniques_full(hist, losses_to_average, verbose=False, group_norm_diffs=
                     group[j] = (elem - elem.mean()) / elem.std()
                 mean = np.mean(means)
                 std = np.mean(stds)
-                one_optim_hist["hist"]["norm_diffs"][i] = (np.concatenate(group) + mean) * std
+                one_optim_hist["hist"]["norm_diffs"][i] = np.concatenate(group) * std + mean
 
     grouped_hist = [grouped_hist[x]["hist"] for x in grouped_hist]
             
