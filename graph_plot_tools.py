@@ -49,7 +49,7 @@ def group_uniques(hist, one_optim_hist, group_unique, loss_name):
         return res
 
 
-def make_loss_plot(ax, hist, eps=0.01, alpha=0.5, make_train=True, make_val=True, starting_epoch=0, group_unique=False):
+def make_loss_plot(ax, hist, eps=0.01, alpha=0.5, make_train=True, make_val=True, starting_epoch=0, group_unique=False, loss_name="logloss"):
     if len(hist) < 7:
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
     else:
@@ -97,20 +97,20 @@ def make_loss_plot(ax, hist, eps=0.01, alpha=0.5, make_train=True, make_val=True
             ax.axvline(x, linestyle="--", color=colors[i], alpha=0.2)
 
     if make_train and make_val:
-        ax.set_title("logloss on train/val with different optimizers")
+        ax.set_title("{} on train/val with different optimizers".format(loss_name))
     elif make_train:
-        ax.set_title("logloss on train with different optimizers")
+        ax.set_title("{} on train with different optimizers".format(loss_name))
     elif make_val:
-        ax.set_title("logloss on val with different optimizers")
-    ax.set_ylabel("logloss")
+        ax.set_title("{} on val with different optimizers".format(loss_name))
+    ax.set_ylabel("{}".format(loss_name))
     ax.set_xlabel("Iteration")
     ax.grid(True)
     ax.legend()
 
     return ax
-
-
-def make_accuracy_plot(ax, hist, eps=0.01, alpha=0.5, top_k=1, make_train=True, make_val=True, starting_epoch=0):
+    
+    
+def make_metrics_plot(ax, hist, eps=0.01, alpha=0.5, make_train=True, make_val=True, starting_epoch=0, metric_name="acc_top_1", title="top-1 accuracy"):
     if len(hist) < 7:
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
     else:
@@ -127,7 +127,7 @@ def make_accuracy_plot(ax, hist, eps=0.01, alpha=0.5, top_k=1, make_train=True, 
         start = int(epochs_x[0])
 
         if make_train:
-            train_acc_top = one_optim_hist["train_acc_top_{}".format(top_k)]
+            train_acc_top = one_optim_hist["train_{}".format(metric_name)]
             smoothed_train_acc_top = smooth(train_acc_top, eps=eps)[start:]
             train_x = one_optim_hist["train_x"][start:]
             ax.plot(
@@ -137,7 +137,7 @@ def make_accuracy_plot(ax, hist, eps=0.01, alpha=0.5, top_k=1, make_train=True, 
             )
 
         if make_val and len(one_optim_hist["val_x"]) > 0:
-            val_acc_top = one_optim_hist["val_acc_top_{}".format(top_k)]
+            val_acc_top = one_optim_hist["val_{}".format(metric_name)]
             val_x = one_optim_hist["val_x"]
             ind = bisect.bisect_left(val_x, start)
             ax.plot(
@@ -152,17 +152,21 @@ def make_accuracy_plot(ax, hist, eps=0.01, alpha=0.5, top_k=1, make_train=True, 
 
 
     if make_train and make_val:
-        ax.set_title("top-{} accuracy on train/val".format(top_k))
+        ax.set_title("{} on train/val".format(title))
     elif make_train:
-        ax.set_title("top-{} accuracy on train".format(top_k))
+        ax.set_title("{} on train".format(title))
     elif make_val:
-        ax.set_title("top-{} accuracy on val".format(top_k))
+        ax.set_title("{} on val".format(title))
     
-    ax.set_ylabel("top-{} accuracy".format(top_k))
+    ax.set_ylabel("{}".format(title))
     ax.set_xlabel("Iteration")
     ax.grid(True)
 
     return ax
+
+
+def make_accuracy_plot(ax, hist, eps=0.01, alpha=0.5, top_k=1, make_train=True, make_val=True, starting_epoch=0):
+    return make_metrics_plot(ax, hist, eps, alpha, make_train, make_val, starting_epoch, metric_name="acc_top_{}".format(top_k), title="top-{} accuracy".format(top_k))
 
 
 def make_plot(
@@ -192,8 +196,14 @@ def make_plot(
             line_marker = None
             mark_every = None
 
+        if len(one_optim_hist["epochs_x"]) <= starting_epoch:
+            continue
+
         epochs_x = one_optim_hist["epochs_x"][starting_epoch:]
         start = int(epochs_x[0])
+
+        if len(one_optim_hist[y_name]) == 0:
+            continue
 
         smoothed_y = smooth(one_optim_hist[y_name], eps=eps)
         x = one_optim_hist[x_name]

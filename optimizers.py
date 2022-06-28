@@ -203,6 +203,9 @@ class clipped_SSTM(Optimizer):
             At big steps, A_k / A_{k+1} ratio tends to 1, thus the method becomes too conservative. 
             If a_k_ratio_upper_bound < A_k / A_{k+1} we manually set 
             A_k = a_k_ratio_upper_bound * A_{k+1}, see code for details 
+        clipping_iter_start (int, optional): must be > 0. If specified, \nu > 0 and clipping_type=='norm' then 
+        	clipping_level will be chosen to ensure that clipping starts at this iteration of method
+        	(we can find clipping_level B from B / (k^{2\nu/(1+\nu)}\alpha_0) = 1 when \nu > 0) 
     Example:
         >>> optimizer = clipped_SSTM(model.parameters(), lr=0.01, L=10,
                                      clipping_type='norm', clipping_level=10)
@@ -215,7 +218,7 @@ class clipped_SSTM(Optimizer):
         self, params, 
         lr=required, L=required, 
         clipping_type='norm', clipping_level=depending('clipping_type'), 
-        nu=1, a_k_ratio_upper_bound=1.0
+        nu=1, a_k_ratio_upper_bound=1.0, clipping_iter_start=None
     ):
         if lr is not required and lr <= 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -239,6 +242,17 @@ class clipped_SSTM(Optimizer):
             raise ValueError("Invalid nu: {}".format(nu))
         if a_k_ratio_upper_bound <= 0.0 or a_k_ratio_upper_bound > 1.0:
             raise ValueError("Invalid a_k_ratio_upper_bound: {}".format(a_k_ratio_upper_bound))
+        if clipping_iter_start is not None:
+            if not isinstance(clipping_iter_start, int) or clipping_iter_start <= 0:
+	            raise ValueError("Invalid clipping_iter_start: {}, should be positive integer")
+            if (nu > 0 and clipping_type == 'norm'):
+                a = 1 / lr
+                # clipping_level / ( 1 / (2 * a * L) * (k + 1) ** (2 * nu / (1 + nu))) = 1
+                clipping_level = 1 / (2 * a * L) * (clipping_iter_start + 1) ** (2 * nu / (1 + nu))
+                # print(clipping_level)
+            elif (nu < 1e-4):
+                a = 1 / lr
+                clipping_level = clipping_level / (2 * a * L)
 
         defaults = dict(
             lr=lr, L=L, 
@@ -334,6 +348,7 @@ class clipped_SSTM(Optimizer):
                     A_k_1 = ratio_mul_factor * alpha_k_1
 
             lambda_k_1 = clipping_level / alpha_k_1
+            # lambda_k_1 = clipping_level
             
             state['y_k'] = y_k
             state['z_k'] = z_k

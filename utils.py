@@ -77,10 +77,10 @@ def group_uniques_full(hist, losses_to_average, verbose=False, group_norm_diffs=
     return grouped_hist
 
 
-def load_hist_jsons(hists_names_list):
+def load_hist_jsons(hists_names_list, path="./models"):
     hists = []
     for hist_name in hists_names_list:
-        with open(r"./models/{}.json".format(hist_name), "r") as read_file:
+        with open(r"{}/{}.json".format(path, hist_name), "r") as read_file:
             hist = json.load(read_file)
             hists += hist
     return hists
