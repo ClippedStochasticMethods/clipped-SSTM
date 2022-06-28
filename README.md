@@ -6,7 +6,15 @@ This is the code for the experiments from the paper "Near-Optimal High Probabili
 
 — graphs.ipynb — Jupyter Notebook for making the plots
 
+— synthetic.ipynb — Jupyter Notebook for running the experiments on synthetic data
+
 — heavy_tail_bert_cola.ipynb — Jupyter Notebook for running the experiments on BERT + CoLA task
+
+— heavy_tail_bert_mrpc.ipynb — Jupyter Notebook for running the experiments on BERT + MRPC task
+
+— heavy_tail_bert_sst-2.ipynb — Jupyter Notebook for running the experiments on BERT + SST-2 task
+
+— heavy_tail_bert_stsb.ipynb — Jupyter Notebook for running the experiments on BERT + STS-B task
 
 — heavy_tail_resnet_imagenet.ipynb —  Jupyter Notebook for running the experiments on ResNet + Imagenet-100 task. To run these experiments one needs to download Imagenet-100 dataset
 
