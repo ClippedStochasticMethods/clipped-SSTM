@@ -1,6 +1,6 @@
 # clipped-SSTM
 
-This is the code for the experiments from the paper "Gradient Clipping Helps in Non-Smooth Stochastic Optimization with Heavy-Tailed Noise". Files:
+This is the code for the experiments from the paper "Near-Optimal High Probability Complexity Bounds for Non-Smooth Stochastic Convex Optimization with Heavy-Tailed Noise". Files:
 
 — graph_tools_lot.py — functions for making the plots
 
@@ -13,3 +13,14 @@ This is the code for the experiments from the paper "Gradient Clipping Helps in 
 — optimizers.py — implementation of clipped-SSTM and clipped-SGD in PyTorch
 
 — utils.py — helper functions
+
+
+## Licence
+If you want to use our code, please, cite our work:
+> @article{gorbunov2021near,
+>  title={Near-optimal high probability complexity bounds for non-smooth stochastic optimization with heavy-tailed noise},
+>  author={Gorbunov, Eduard and Danilova, Marina and Shibaev, Innokentiy and Dvurechensky, Pavel and Gasnikov, Alexander},
+>  journal={arXiv preprint arXiv:2106.05958},
+>  year={2021}
+> }
+
